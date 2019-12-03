@@ -47,20 +47,20 @@ while True:
         for row in CACHE:
             ts, topic, payload = row
             
-            cursor.execute('SELECT COUNT(topic) FROM device.external_mqtt_broker_last_values WHERE topic=%s', (topic, ))
+            cursor.execute('SELECT COUNT(topic) FROM {} WHERE topic=%s'.format(CFG['db']['table_last_values']), (topic, ))
             r = cursor.fetchall()
             
             if r[0].count == 0:
-                cursor.execute('INSERT INTO device.external_mqtt_broker_last_values(topic,message,ts) VALUES(%s,%s,%s)',
+                cursor.execute('INSERT INTO {}(topic,message,ts) VALUES(%s,%s,%s)'.format(CFG['db']['table_last_values']),
                                (topic, payload, ts))
             else:
-                cursor.execute('UPDATE device.external_mqtt_broker_last_values SET message=%s, ts=%s WHERE topic=%s',
+                cursor.execute('UPDATE {} SET message=%s, ts=%s WHERE topic=%s'.format(CFG['db']['table_last_values']),
                                (payload, ts, topic))
             
-            cursor.execute('INSERT INTO device.external_mqtt_broker_history(ts,topic,message) values(%s,%s,%s)', (ts, topic, payload))
+            cursor.execute('INSERT INTO {}(ts,topic,message) values(%s,%s,%s)'.format(CFG['db']['table_history']), (ts, topic, payload))
             
-        cursor.close()
         dbConn.commit()
+        cursor.close()
         CACHE = []
         
     client.loop(0.01)
