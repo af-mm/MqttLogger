@@ -21,7 +21,7 @@ def on_message(client, userdata, message):
     print('{}: {}'.format(topic, payload))
     
     CACHE.append((
-        datetime.now(),
+        datetime.utcnow(),
         topic,
         payload
     ))
