@@ -1,12 +1,12 @@
-create table mqtt_broker_history(
-	id serial primary key,
-	ts timestamptz not null default current_timestamp,
-	topic varchar(255) not null,
-	message varchar(4096) not NULL
+CREATE TABLE mqtt_broker_history(
+	id serial PRIMARY KEY,
+	ts timestamptz NOT NULL DEFAULT current_timestamp,
+	topic varchar(255) NOT NULL,
+	message varchar(4096) NOT NULL
 );
 
-create table mqtt_broker_last_values(
-	topic varchar(255) not null primary key,
-	message varchar(4096) not null,
-	ts timestamptz not null default current_timestamp
+CREATE TABLE mqtt_broker_last_values(
+	topic varchar(255) NOT NULL PRIMARY KEY,
+	message varchar(4096) NOT NULL,
+	ts timestamptz NOT NULL DEFAULT current_timestamp
 );
