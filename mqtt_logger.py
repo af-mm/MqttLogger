@@ -40,12 +40,12 @@ dbConn = psycopg2.connect(  host=CFG['db']['host'],
                             password=CFG['db']['password'])
 print('Connected to database')
 
-while True:
-    countLastValueTopicQuery = 'SELECT COUNT(topic) FROM {} WHERE topic=%s'.format(CFG['db']['table_last_values'])
-    insertLastValueQuery = 'INSERT INTO {}(topic,message,ts) VALUES(%s,%s,%s)'.format(CFG['db']['table_last_values'])
-    updateLastValueQuery = 'UPDATE {} SET message=%s, ts=%s WHERE topic=%s'.format(CFG['db']['table_last_values'])
-    insertHistoryQuery = 'INSERT INTO {}(ts,topic,message) values(%s,%s,%s)'.format(CFG['db']['table_history'])
+countLastValueTopicQuery = 'SELECT COUNT(topic) FROM {} WHERE topic=%s'.format(CFG['db']['table_last_values'])
+insertLastValueQuery = 'INSERT INTO {}(topic,message,ts) VALUES(%s,%s,%s)'.format(CFG['db']['table_last_values'])
+updateLastValueQuery = 'UPDATE {} SET message=%s, ts=%s WHERE topic=%s'.format(CFG['db']['table_last_values'])
+insertHistoryQuery = 'INSERT INTO {}(ts,topic,message) values(%s,%s,%s)'.format(CFG['db']['table_history'])
     
+while True:    
     if len(CACHE) > 0:
         cursor = dbConn.cursor(cursor_factory=NamedTupleCursor)
 
