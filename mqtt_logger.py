@@ -64,7 +64,7 @@ while True:
         dbConn.commit()
         CACHE = []
         
-    client.loop(2)
+    client.loop(1)
 
 dbCursor.close()
 dbConn.close()
