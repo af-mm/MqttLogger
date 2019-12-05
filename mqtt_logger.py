@@ -38,6 +38,7 @@ dbConn = psycopg2.connect(  host=CFG['db']['host'],
                             dbname=CFG['db']['dbname'],
                             user=CFG['db']['user'],
                             password=CFG['db']['password'])
+dbCursor = dbConn.cursor(cursor_factory=NamedTupleCursor)
 print('Connected to database')
 
 countLastValueTopicQuery = 'SELECT COUNT(topic) FROM {} WHERE topic=%s'.format(CFG['db']['table_last_values'])
@@ -47,26 +48,23 @@ insertHistoryQuery = 'INSERT INTO {}(ts,topic,message) values(%s,%s,%s)'.format(
     
 while True:    
     if len(CACHE) > 0:
-        cursor = dbConn.cursor(cursor_factory=NamedTupleCursor)
-
         for row in CACHE:
             ts, topic, payload = row
             
-            cursor.execute(countLastValueTopicQuery, (topic, ))
-            r = cursor.fetchall()
+            dbCursor.execute(countLastValueTopicQuery, (topic, ))
+            r = dbCursor.fetchall()
             
             if r[0].count == 0:
-                cursor.execute(insertLastValueQuery, (topic, payload, ts))
+                dbCursor.execute(insertLastValueQuery, (topic, payload, ts))
             else:
-                cursor.execute(updateLastValueQuery, (payload, ts, topic))
+                dbCursor.execute(updateLastValueQuery, (payload, ts, topic))
             
-            cursor.execute(insertHistoryQuery, (ts, topic, payload))
+            dbCursor.execute(insertHistoryQuery, (ts, topic, payload))
             
         dbConn.commit()
-        cursor.close()
         CACHE = []
         
-    client.loop(0.01)
+    client.loop(2)
 
+dbCursor.close()
 dbConn.close()
-
