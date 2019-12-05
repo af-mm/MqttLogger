@@ -2,7 +2,7 @@
 CFG = {
     'mqtt': {
         'host': '',
-        'port': 
+        'port': 0
     },
     'db': {
         'host': '',

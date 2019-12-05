@@ -41,23 +41,26 @@ dbConn = psycopg2.connect(  host=CFG['db']['host'],
 print('Connected to database')
 
 while True:
+    countLastValueTopicQuery = 'SELECT COUNT(topic) FROM {} WHERE topic=%s'.format(CFG['db']['table_last_values'])
+    insertLastValueQuery = 'INSERT INTO {}(topic,message,ts) VALUES(%s,%s,%s)'.format(CFG['db']['table_last_values'])
+    updateLastValueQuery = 'UPDATE {} SET message=%s, ts=%s WHERE topic=%s'.format(CFG['db']['table_last_values'])
+    insertHistoryQuery = 'INSERT INTO {}(ts,topic,message) values(%s,%s,%s)'.format(CFG['db']['table_history'])
+    
     if len(CACHE) > 0:
         cursor = dbConn.cursor(cursor_factory=NamedTupleCursor)
 
         for row in CACHE:
             ts, topic, payload = row
             
-            cursor.execute('SELECT COUNT(topic) FROM {} WHERE topic=%s'.format(CFG['db']['table_last_values']), (topic, ))
+            cursor.execute(countLastValueTopicQuery, (topic, ))
             r = cursor.fetchall()
             
             if r[0].count == 0:
-                cursor.execute('INSERT INTO {}(topic,message,ts) VALUES(%s,%s,%s)'.format(CFG['db']['table_last_values']),
-                               (topic, payload, ts))
+                cursor.execute(insertLastValueQuery, (topic, payload, ts))
             else:
-                cursor.execute('UPDATE {} SET message=%s, ts=%s WHERE topic=%s'.format(CFG['db']['table_last_values']),
-                               (payload, ts, topic))
+                cursor.execute(updateLastValueQuery, (payload, ts, topic))
             
-            cursor.execute('INSERT INTO {}(ts,topic,message) values(%s,%s,%s)'.format(CFG['db']['table_history']), (ts, topic, payload))
+            cursor.execute(insertHistoryQuery, (ts, topic, payload))
             
         dbConn.commit()
         cursor.close()
