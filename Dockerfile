@@ -16,4 +16,4 @@ ENV MQTT_BROKER_HOST=localhost \
 	DB_LAST_VALUES_TABLE=mqtt_broker_last_values \
 	DB_HISTORY_TABLE=mqtt_broker_history
 
-CMD [ "python3", "./mqtt_logger.py" ]
+CMD [ "python3", "-u", "./mqtt_logger.py" ]
