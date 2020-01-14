@@ -2,6 +2,7 @@ import paho.mqtt.client as mqtt
 import psycopg2
 from psycopg2.extras import NamedTupleCursor
 from datetime import datetime
+import signal
 from config import CFG
 
 CACHE = []
@@ -46,25 +47,39 @@ insertLastValueQuery = 'INSERT INTO {}(topic,message,ts) VALUES(%s,%s,%s)'.forma
 updateLastValueQuery = 'UPDATE {} SET message=%s, ts=%s WHERE topic=%s'.format(CFG['db']['table_last_values'])
 insertHistoryQuery = 'INSERT INTO {}(ts,topic,message) values(%s,%s,%s)'.format(CFG['db']['table_history'])
     
-while True:    
-    if len(CACHE) > 0:
-        for row in CACHE:
-            ts, topic, payload = row
+isItRunning = True
+
+def sigterm_handler(signal, frame):
+    print('SIGTERM caught')
+    
+    global isItRunning
+    isItRunning = False
+    
+signal.signal(signal.SIGTERM, sigterm_handler)
+    
+try:
+    while isItRunning:    
+        if len(CACHE) > 0:
+            for row in CACHE:
+                ts, topic, payload = row
+                
+                dbCursor.execute(countLastValueTopicQuery, (topic, ))
+                r = dbCursor.fetchall()
+                
+                if r[0].count == 0:
+                    dbCursor.execute(insertLastValueQuery, (topic, payload, ts))
+                else:
+                    dbCursor.execute(updateLastValueQuery, (payload, ts, topic))
+                
+                dbCursor.execute(insertHistoryQuery, (ts, topic, payload))
+                
+            dbConn.commit()
+            CACHE = []
             
-            dbCursor.execute(countLastValueTopicQuery, (topic, ))
-            r = dbCursor.fetchall()
-            
-            if r[0].count == 0:
-                dbCursor.execute(insertLastValueQuery, (topic, payload, ts))
-            else:
-                dbCursor.execute(updateLastValueQuery, (payload, ts, topic))
-            
-            dbCursor.execute(insertHistoryQuery, (ts, topic, payload))
-            
-        dbConn.commit()
-        CACHE = []
-        
-    client.loop(1)
+        client.loop(1)
+
+except KeyboardInterrupt:
+    print('KeyboardInterrupt caught')
 
 dbCursor.close()
 dbConn.close()
