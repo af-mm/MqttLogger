@@ -8,6 +8,8 @@ RUN pip3 install -r requirements.txt
 
 ENV MQTT_BROKER_HOST=localhost \
 	MQTT_BROKER_PORT=1024 \
+	MQTT_LOGIN=MqttLogger \
+	MQTT_PSWD=None \
 	DB_HOST=localhost \
 	DB_PORT=1025 \
 	DB_USER=postgres \

@@ -3,7 +3,9 @@ import os
 CFG = {
     'mqtt': {
         'host': os.getenv('MQTT_BROKER_HOST', 'localhost'),
-        'port': int(os.getenv('MQTT_BROKER_PORT', '1024'))
+        'port': int(os.getenv('MQTT_BROKER_PORT', '1024')),
+        'login': os.getenv('MQTT_LOGIN', 'MqttLogger'),
+        'password': os.getenv('MQTT_PSWD', '')
     },
     'db': {
         'host': os.getenv('DB_HOST', 'localhost'),

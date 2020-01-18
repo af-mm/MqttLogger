@@ -30,6 +30,8 @@ def on_message(client, userdata, message):
 client = mqtt.Client();
 client.on_connect = on_connect
 client.on_message = on_message
+client.username_pw_set( CFG['mqtt']['login'],
+                        CFG['mqtt']['password'])
 client.connect( CFG['mqtt']['host'],
                 CFG['mqtt']['port'],
                 60)
