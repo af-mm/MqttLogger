@@ -2,7 +2,7 @@ FROM python:3.7
 
 WORKDIR /MqttLogger
 
-COPY config.py mqtt_logger.py requirements.txt ./
+COPY src requirements.txt ./
 
 RUN pip3 install -r requirements.txt
 

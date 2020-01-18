@@ -1,1 +1,1 @@
-sudo docker build -t afmm/mqtt_logger:1.0 .
+docker build -t afmm/mqtt_logger:1.0 .
